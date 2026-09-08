@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.py[cod]
+.streamlit/
+data/raw/
+data/processed/
+data/demo/
+models/*.pt
+models/*.json
+outputs/*.wav
+outputs/*.png
+outputs/*.csv
+!data/.gitkeep
+!models/.gitkeep
+!outputs/.gitkeep
+"./WhatsApp Ptt 2026-09-08 at 10.13.23.ogg"
