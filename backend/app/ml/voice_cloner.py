@@ -56,6 +56,36 @@ class VoiceCloningEngine:
         and autoregressively synthesizes the prompt in the exact speaker persona.
         """
         try:
+            import os
+            os.environ["COQUI_TOS_AGREED"] = "1"
+
+            # Apply soundfile-backed safe audio IO to prevent torchaudio/torchcodec DLL conflicts
+            try:
+                import soundfile as sf
+                import torch
+                import torchaudio
+
+                def _safe_load(filepath, *args, **kwargs):
+                    audio, sample_rate = sf.read(filepath)
+                    tensor = torch.from_numpy(audio).float()
+                    if tensor.ndim == 1:
+                        tensor = tensor.unsqueeze(0)
+                    elif tensor.ndim == 2:
+                        tensor = tensor.t()
+                    return tensor, sample_rate
+
+                def _safe_save(filepath, src, sample_rate, *args, **kwargs):
+                    if isinstance(src, torch.Tensor):
+                        src = src.detach().cpu().numpy()
+                    if src.ndim == 2:
+                        src = src.T
+                    sf.write(filepath, src, sample_rate)
+
+                torchaudio.load = _safe_load
+                torchaudio.save = _safe_save
+            except Exception:
+                pass
+
             if self._xtts_model is None:
                 from TTS.api import TTS
                 import torch
@@ -65,20 +95,29 @@ class VoiceCloningEngine:
                     "cuda" if use_gpu else "cpu"
                 )
 
+            # Ensure reference audio is PCM WAV for universal speaker encoder ingestion
+            speaker_wav_path = reference_path
+            if reference_path.suffix.lower() != ".wav":
+                import soundfile as sf
+                temp_wav = reference_path.with_suffix(".tmp_ref.wav")
+                d, sr = sf.read(str(reference_path))
+                sf.write(str(temp_wav), d, sr)
+                speaker_wav_path = temp_wav
+
             self._xtts_model.tts_to_file(
                 text=text,
-                speaker_wav=str(reference_path),
+                speaker_wav=str(speaker_wav_path),
                 language="en",
                 file_path=str(output_path)
             )
 
             if output_path.exists() and output_path.stat().st_size > 1000:
-                # Standardize to 16kHz mono WAV for audio consistency
-                audio, sr = load_and_preprocess_audio(output_path, target_sr=SAMPLE_RATE)
+                # Preserve 24,000 Hz studio audio fidelity from XTTS-v2
+                audio, sr = librosa.load(str(output_path), sr=24000, mono=True)
                 peak = np.max(np.abs(audio)) if len(audio) > 0 else 1.0
                 if peak > 0:
                     audio = (audio / peak) * 0.95
-                save_audio_file(output_path, audio, sr=SAMPLE_RATE)
+                save_audio_file(output_path, audio, sr=24000)
                 return True
         except Exception as exc:
             print(f"[VoiceCloningEngine] XTTS-v2 foundation model unavailable or error: {exc}")
