@@ -1,0 +1,13 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.12
+pydantic>=2.9.0
+numpy>=1.26.0
+scipy>=1.14.0
+librosa>=0.10.2
+soundfile>=0.12.1
+matplotlib>=3.9.0
+torch>=2.2.0
+torchaudio>=2.2.0
+scikit-learn>=1.5.0
+pyttsx3>=2.90

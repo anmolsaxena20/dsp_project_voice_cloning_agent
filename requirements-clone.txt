@@ -1,6 +1,0 @@
-# Install only inside .venv-clone (Python 3.10 or 3.11).
-# XTTS-v2 weights download automatically on first run.
-coqui-tts
-torch==2.8.0
-torchaudio==2.8.0
-transformers>=4.57,<5
