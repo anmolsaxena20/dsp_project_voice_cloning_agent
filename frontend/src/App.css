@@ -1027,3 +1027,211 @@
   color: var(--text-subtle);
   margin-top: 4px;
 }
+
+/* ==========================================================================
+   Voice Cloning Studio — Active Neural Loader & Equalizer
+   ========================================================================== */
+.btn-loader-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.spinner-sm {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.cloning-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 20px;
+  background: radial-gradient(circle at center, rgba(37, 99, 235, 0.08) 0%, rgba(15, 23, 42, 0) 70%);
+  border-radius: var(--radius-lg);
+  border: 1px dashed rgba(59, 130, 246, 0.3);
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { border-color: rgba(59, 130, 246, 0.3); box-shadow: 0 0 15px rgba(59, 130, 246, 0.05); }
+  50% { border-color: rgba(59, 130, 246, 0.6); box-shadow: 0 0 25px rgba(59, 130, 246, 0.15); }
+}
+
+.neural-radar-wrapper {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.neural-radar-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid rgba(59, 130, 246, 0.4);
+}
+
+.neural-radar-ring.ring-1 {
+  width: 100%;
+  height: 100%;
+  animation: ripple 2.4s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+}
+
+.neural-radar-ring.ring-2 {
+  width: 75%;
+  height: 75%;
+  animation: ripple 2.4s cubic-bezier(0.1, 0.8, 0.3, 1) infinite 0.8s;
+}
+
+.neural-radar-ring.ring-3 {
+  width: 50%;
+  height: 50%;
+  animation: ripple 2.4s cubic-bezier(0.1, 0.8, 0.3, 1) infinite 1.6s;
+}
+
+@keyframes ripple {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.neural-radar-core {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  z-index: 2;
+  animation: core-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes core-pulse {
+  0%, 100% { transform: scale(0.96); box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+  50% { transform: scale(1.04); box-shadow: 0 0 25px rgba(59, 130, 246, 0.8); }
+}
+
+.cloning-loader-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.cloning-loader-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  max-width: 380px;
+  line-height: 1.4;
+  margin-bottom: 20px;
+}
+
+/* Soundwave equalizer bars */
+.soundwave-bars {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 36px;
+  margin-bottom: 20px;
+}
+
+.soundwave-bars .bar {
+  width: 4px;
+  height: 8px;
+  background: linear-gradient(to top, #2563eb, #60a5fa);
+  border-radius: 2px;
+  animation: wave 1.2s ease-in-out infinite alternate;
+}
+
+.soundwave-bars .bar-1 { animation-delay: 0.1s; }
+.soundwave-bars .bar-2 { animation-delay: 0.3s; }
+.soundwave-bars .bar-3 { animation-delay: 0.5s; }
+.soundwave-bars .bar-4 { animation-delay: 0.2s; }
+.soundwave-bars .bar-5 { animation-delay: 0.4s; }
+
+@keyframes wave {
+  0% { height: 6px; opacity: 0.4; }
+  100% { height: 32px; opacity: 1; }
+}
+
+/* Progress box & stage tag */
+.cloning-progress-box {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.cloning-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.78rem;
+}
+
+.stage-label {
+  font-weight: 500;
+  color: #60a5fa;
+  text-align: left;
+}
+
+.elapsed-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  background: rgba(37, 99, 235, 0.15);
+  color: #93c5fd;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb, #38bdf8);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.loader-info-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.76rem;
+  color: var(--text-subtle);
+  max-width: 420px;
+  text-align: left;
+  line-height: 1.35;
+}
+
+.loader-info-footer .info-icon {
+  font-size: 0.95rem;
+  color: #f59e0b;
+}

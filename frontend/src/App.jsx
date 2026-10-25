@@ -22,7 +22,21 @@ export default function App() {
   const [clonePrompt, setClonePrompt] = useState('Welcome everyone. This sentence is generated using our zero-shot voice cloning pipeline.')
   const [consentConfirmed, setConsentConfirmed] = useState(false)
   const [isCloning, setIsCloning] = useState(false)
+  const [cloneElapsed, setCloneElapsed] = useState(0)
   const [latestCloned, setLatestCloned] = useState(null)
+
+  useEffect(() => {
+    let timer
+    if (isCloning) {
+      setCloneElapsed(0)
+      timer = setInterval(() => {
+        setCloneElapsed(prev => prev + 1)
+      }, 1000)
+    } else {
+      setCloneElapsed(0)
+    }
+    return () => clearInterval(timer)
+  }, [isCloning])
 
   // AI Deepfake Detection State
   const [detectorSource, setDetectorSource] = useState('upload') // 'upload' | 'active' | 'cloned'
@@ -535,7 +549,14 @@ export default function App() {
                   onClick={handleGenerateClone}
                   disabled={!activeVoice || !clonePrompt.trim() || !consentConfirmed || isCloning}
                 >
-                  <span>{isCloning ? 'Synthesizing...' : 'Synthesize in My Voice'}</span>
+                  {isCloning ? (
+                    <span className="btn-loader-content">
+                      <span className="spinner-sm"></span>
+                      <span>Synthesizing Voice ({cloneElapsed}s)...</span>
+                    </span>
+                  ) : (
+                    <span>Synthesize in My Voice</span>
+                  )}
                 </button>
               </div>
 
@@ -543,12 +564,62 @@ export default function App() {
               <div className="card">
                 <div className="card-header">
                   <h3>Synthesized Speech Output</h3>
-                  <span className={`badge ${latestCloned ? 'badge-success' : 'badge-muted'}`}>
-                    {latestCloned ? 'Synthesis Complete' : 'Idle'}
+                  <span className={`badge ${isCloning ? 'badge-primary' : latestCloned ? 'badge-success' : 'badge-muted'}`}>
+                    {isCloning ? 'Synthesizing...' : latestCloned ? 'Synthesis Complete' : 'Idle'}
                   </span>
                 </div>
 
-                {!latestCloned ? (
+                {isCloning ? (
+                  <div className="cloning-loader-container">
+                    <div className="neural-radar-wrapper">
+                      <div className="neural-radar-ring ring-1"></div>
+                      <div className="neural-radar-ring ring-2"></div>
+                      <div className="neural-radar-ring ring-3"></div>
+                      <div className="neural-radar-core">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                          <path d="M12 2v20M17 5v14M7 8v8M2 11v2M22 11v2"></path>
+                        </svg>
+                      </div>
+                    </div>
+
+                    <h4 className="cloning-loader-title">Zero-Shot Neural Synthesis in Progress</h4>
+                    <p className="cloning-loader-desc">
+                      Conditioning XTTS-v2 foundation model with your 1,024-dimensional speaker embedding.
+                    </p>
+
+                    {/* Animated Equalizer Waves */}
+                    <div className="soundwave-bars">
+                      {[...Array(16)].map((_, i) => (
+                        <span key={i} className={`bar bar-${(i % 5) + 1}`}></span>
+                      ))}
+                    </div>
+
+                    {/* Progress Bar & Stage Indicator */}
+                    <div className="cloning-progress-box">
+                      <div className="cloning-progress-header">
+                        <span className="stage-label">
+                          {cloneElapsed < 6 && 'Phase 1: Extracting Latent Speaker Embeddings...'}
+                          {cloneElapsed >= 6 && cloneElapsed < 16 && 'Phase 2: Autoregressive Neural Token Conditioning...'}
+                          {cloneElapsed >= 16 && 'Phase 3: HiFi-GAN 24kHz Studio Vocoder Synthesis...'}
+                        </span>
+                        <span className="elapsed-badge">{cloneElapsed}s elapsed</span>
+                      </div>
+                      <div className="progress-track">
+                        <div
+                          className="progress-fill"
+                          style={{
+                            width: `${Math.min(95, Math.max(10, (cloneElapsed / 22) * 100))}%`
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    <div className="loader-info-footer">
+                      <span className="info-icon">⚡</span>
+                      <span>Zero-shot neural cloning matches your vocal cords, cadence, and throat resonance directly on cloud CPU.</span>
+                    </div>
+                  </div>
+                ) : !latestCloned ? (
                   <div className="empty-state">
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                       <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
