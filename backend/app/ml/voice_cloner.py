@@ -101,51 +101,44 @@ class VoiceCloningEngine:
         except ImportError:
             return False
 
-        # Select matching base neural voice persona based on pitch & timbre
+        # Select modern Next-Gen HD Multilingual neural persona based on pitch & gender
         f0 = speaker_profile.get("mean_f0_hz", 135.0) or 135.0
         gender = speaker_profile.get("gender_estimate", "male").lower()
 
-        # Neural voice selection
+        # High-Fidelity Conversational Neural Personas (State of the art 2026 standard)
         if gender == "male":
             if f0 < 125:
-                voice = "en-US-GuyNeural"
-                base_f0 = 115.0
-            elif f0 < 155:
-                voice = "en-US-ChristopherNeural"
-                base_f0 = 135.0
+                # Deep, authoritative, warm male
+                voice = "en-US-BrianMultilingualNeural"
+            elif f0 < 165:
+                # Expressive, natural conversational male (ChatGPT/Assistant style)
+                voice = "en-US-AndrewMultilingualNeural"
             else:
-                voice = "en-US-EricNeural"
-                base_f0 = 150.0
+                # Higher pitch natural male
+                voice = "en-IN-PrabhatNeural"
         else:
-            if f0 > 220:
-                voice = "en-US-AnaNeural"
-                base_f0 = 230.0
-            elif f0 > 185:
-                voice = "en-US-JennyNeural"
-                base_f0 = 200.0
+            if f0 > 210:
+                # Expressive, bright female
+                voice = "en-US-EmmaMultilingualNeural"
+            elif f0 > 170:
+                # Balanced conversational female
+                voice = "en-US-AvaMultilingualNeural"
             else:
-                voice = "en-US-AriaNeural"
-                base_f0 = 180.0
-
-        # Calculate pitch adaptation offset
-        pitch_diff = int(round(f0 - base_f0))
-        pitch_str = f"{'+' if pitch_diff >= 0 else ''}{pitch_diff}Hz"
-
-        # Rate adaptation: standard conversational rate
-        rate_str = "+0%"
+                # Warm, grounded female
+                voice = "en-IN-NeerjaNeural"
 
         async def _run_tts(out_file: str) -> None:
+            # Let the neural model use its native expressive prosody without artificial pitch warping
             communicate = edge_tts.Communicate(
                 text,
                 voice,
-                pitch=pitch_str,
-                rate=rate_str
+                pitch="+0Hz",
+                rate="+0%"
             )
             await communicate.save(out_file)
 
         temp_mp3 = output_path.with_suffix(".tmp.mp3")
         try:
-            # Handle running inside or outside existing asyncio event loop
             try:
                 loop = asyncio.get_event_loop()
                 if loop.is_running():
@@ -158,15 +151,15 @@ class VoiceCloningEngine:
                 asyncio.run(_run_tts(str(temp_mp3)))
 
             if temp_mp3.exists() and temp_mp3.stat().st_size > 500:
-                # Load and convert to 16kHz mono WAV
-                audio, sr = librosa.load(str(temp_mp3), sr=SAMPLE_RATE, mono=True)
+                # Load with native studio-grade 24,000 Hz sample rate (ChatGPT voice standard)
+                audio, sr = librosa.load(str(temp_mp3), sr=24000, mono=True)
 
-                # Apply peak normalization
+                # Gentle studio peak normalization
                 peak = np.max(np.abs(audio)) if len(audio) > 0 else 1.0
                 if peak > 0:
                     audio = (audio / peak) * 0.95
 
-                save_audio_file(output_path, audio, sr=SAMPLE_RATE)
+                save_audio_file(output_path, audio, sr=24000)
 
                 try:
                     temp_mp3.unlink()
