@@ -105,27 +105,12 @@ class VoiceCloningEngine:
         f0 = speaker_profile.get("mean_f0_hz", 135.0) or 135.0
         gender = speaker_profile.get("gender_estimate", "male").lower()
 
-        # High-Fidelity Conversational Neural Personas (State of the art 2026 standard)
+        # High-Fidelity Conversational Neural Personas
+        # Uses natural Indian English neural voices for Indian acoustic profiles
         if gender == "male":
-            if f0 < 125:
-                # Deep, authoritative, warm male
-                voice = "en-US-BrianMultilingualNeural"
-            elif f0 < 165:
-                # Expressive, natural conversational male (ChatGPT/Assistant style)
-                voice = "en-US-AndrewMultilingualNeural"
-            else:
-                # Higher pitch natural male
-                voice = "en-IN-PrabhatNeural"
+            voice = "en-IN-PrabhatNeural"
         else:
-            if f0 > 210:
-                # Expressive, bright female
-                voice = "en-US-EmmaMultilingualNeural"
-            elif f0 > 170:
-                # Balanced conversational female
-                voice = "en-US-AvaMultilingualNeural"
-            else:
-                # Warm, grounded female
-                voice = "en-IN-NeerjaNeural"
+            voice = "en-IN-NeerjaNeural"
 
         async def _run_tts(out_file: str) -> None:
             # Let the neural model use its native expressive prosody without artificial pitch warping
