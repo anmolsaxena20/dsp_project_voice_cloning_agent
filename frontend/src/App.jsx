@@ -1,6 +1,14 @@
 import { useState, useRef, useEffect } from 'react'
 import './App.css'
 
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || 'https://backend.voxlab.agamotto.tech').replace(/\/$/, '')
+
+const getAudioUrl = (url) => {
+  if (!url) return ''
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  return `${API_BASE}${url}`
+}
+
 export default function App() {
   // Navigation
   const [activeTab, setActiveTab] = useState('upload')
@@ -33,7 +41,7 @@ export default function App() {
   const handleLoadSample = async () => {
     setIsUploading(true)
     try {
-      const res = await fetch('/api/audio/sample')
+      const res = await fetch(`${API_BASE}/api/audio/sample`)
       if (!res.ok) throw new Error(await res.text())
       const data = await res.json()
       setActiveVoice(data)
@@ -52,7 +60,7 @@ export default function App() {
     formData.append('file', file)
 
     try {
-      const res = await fetch('/api/audio/upload', {
+      const res = await fetch(`${API_BASE}/api/audio/upload`, {
         method: 'POST',
         body: formData
       })
@@ -74,7 +82,7 @@ export default function App() {
     if (!activeVoice || !clonePrompt.trim() || !consentConfirmed) return
     setIsCloning(true)
     try {
-      const res = await fetch('/api/clone/generate', {
+      const res = await fetch(`${API_BASE}/api/clone/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -125,7 +133,7 @@ export default function App() {
     }
 
     try {
-      const res = await fetch('/api/security/detect', {
+      const res = await fetch(`${API_BASE}/api/security/detect`, {
         method: 'POST',
         body: formData
       })
@@ -147,7 +155,7 @@ export default function App() {
     if (!activeVoice || !latestCloned) return
     setIsComparing(true)
     try {
-      const res = await fetch('/api/security/compare', {
+      const res = await fetch(`${API_BASE}/api/security/compare`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -309,7 +317,7 @@ export default function App() {
                         <strong>{activeVoice.original_filename}</strong>
                         <span className="mono-tag">{activeVoice.features.duration_seconds}s</span>
                       </div>
-                      <audio controls src={activeVoice.audio_url} className="custom-audio-player"></audio>
+                      <audio controls src={getAudioUrl(activeVoice.audio_url)} className="custom-audio-player"></audio>
                     </div>
 
                     <div className="quick-metrics-grid">
@@ -557,7 +565,7 @@ export default function App() {
                         <strong>{latestCloned.filename}</strong>
                         <span className="mono-tag">{latestCloned.duration_seconds}s</span>
                       </div>
-                      <audio controls src={latestCloned.audio_url} className="custom-audio-player"></audio>
+                      <audio controls src={getAudioUrl(latestCloned.audio_url)} className="custom-audio-player"></audio>
                     </div>
 
                     <div className="similarity-box">
@@ -575,7 +583,7 @@ export default function App() {
                     </div>
 
                     <div className="result-actions-row">
-                      <a href={latestCloned.audio_url} download={latestCloned.filename} className="btn btn-secondary flex-1">
+                      <a href={getAudioUrl(latestCloned.audio_url)} download={latestCloned.filename} className="btn btn-secondary flex-1">
                         Download Cloned WAV
                       </a>
                       <button

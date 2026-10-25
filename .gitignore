@@ -15,3 +15,8 @@ outputs/*.csv
 !outputs/.gitkeep
 "./WhatsApp Ptt 2026-09-08 at 10.13.23.ogg"
 IMPLEMENTATION_PLAN.md
+
+# Viva exam study guide PDF (internal prep only)
+VIVA_EXAM_DSP_ML_INDEPTH_STUDY_PLAN.pdf
+VIVA_*.pdf
+generate_viva_study_guide.py

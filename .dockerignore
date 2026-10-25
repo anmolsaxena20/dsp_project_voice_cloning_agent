@@ -1,0 +1,22 @@
+.git
+.gitignore
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+*.pdf
+
+# Exclude all frontend files from backend docker context
+frontend/
+node_modules/
+
+# Exclude local storage and test artifacts
+backend/storage/uploads/*
+backend/storage/cloned/*
+backend/storage/analysis/*
+!backend/storage/uploads/.gitkeep
+!backend/storage/cloned/.gitkeep
+!backend/storage/analysis/.gitkeep
+backend/tests/
