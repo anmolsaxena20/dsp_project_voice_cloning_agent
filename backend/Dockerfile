@@ -1,25 +1,26 @@
 # ==========================================
 # Stage 1: Build & Dependencies Builder
 # ==========================================
-FROM python:3.11-slim as builder
+FROM python:3.11-slim AS builder
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Install temporary build tools needed for wheels compiling
+# Install temporary build tools needed for C-extensions/wheels
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /install
 
-# Copy requirements
+# Copy requirements from root build context
 COPY backend/requirements.txt /install/requirements.txt
 
-# Install PyTorch CPU-only (~180MB vs 2.5GB CUDA) and dependencies into isolated prefix
+# Install Python dependencies with CPU-only PyTorch (avoids 4GB NVIDIA CUDA download)
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir --prefix=/install/local torch torchaudio --index-url https://download.pytorch.org/whl/cpu && \
-    pip install --no-cache-dir --prefix=/install/local -r /install/requirements.txt
+    pip install --no-cache-dir --prefix=/install/local \
+        --extra-index-url https://download.pytorch.org/whl/cpu \
+        -r /install/requirements.txt
 
 
 # ==========================================
@@ -48,7 +49,7 @@ COPY --from=builder /install/local /usr/local
 # Copy ONLY backend application code
 COPY backend /app/backend
 
-# Create runtime storage directories if missing
+# Create runtime storage directories
 RUN mkdir -p /app/backend/storage/uploads \
              /app/backend/storage/cloned \
              /app/backend/storage/analysis
