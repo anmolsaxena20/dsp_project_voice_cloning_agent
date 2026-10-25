@@ -5,10 +5,12 @@ FROM python:3.11-slim AS builder
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV COQUI_TOS_AGREED=1
 
 # Install temporary build tools needed for C-extensions/wheels
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /install
@@ -16,8 +18,8 @@ WORKDIR /install
 # Copy requirements from root build context
 COPY backend/requirements.txt /install/requirements.txt
 
-# Install Python dependencies with CPU-only PyTorch (avoids 4GB NVIDIA CUDA download)
-RUN pip install --no-cache-dir --upgrade pip && \
+# Install Python dependencies with CPU-only PyTorch and Neural TTS
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
     pip install --no-cache-dir --prefix=/install/local \
         --extra-index-url https://download.pytorch.org/whl/cpu \
         -r /install/requirements.txt
@@ -30,6 +32,7 @@ FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV COQUI_TOS_AGREED=1
 ENV PORT=8000
 ENV PYTHONPATH=/app
 
@@ -39,6 +42,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libsndfile1 \
     espeak-ng \
     curl \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 WORKDIR /app
