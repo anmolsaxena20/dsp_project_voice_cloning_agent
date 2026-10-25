@@ -58,7 +58,18 @@ if static_target.exists():
         index_file = static_target / "index.html"
         if index_file.exists():
             return FileResponse(index_file)
-        return {"message": "Frontend index.html not found. Please run npm run build in frontend."}
+        return {"service": "AI Voice Cloning & DSP Acoustic Lab API", "docs": "/docs", "health": "/api/health"}
+else:
+    @app.get("/")
+    async def api_root():
+        """Root API info when frontend is hosted separately (e.g. Cloudflare Pages)."""
+        return {
+            "service": "AI Voice Cloning & DSP Acoustic Lab API",
+            "version": "2.0.0",
+            "status": "online",
+            "docs": "/docs",
+            "health": "/api/health"
+        }
 
 
 if __name__ == "__main__":
